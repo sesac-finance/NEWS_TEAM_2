@@ -8,6 +8,7 @@ import json
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup as bs
+import re
 
 
 class NaverSpider_inactive(scrapy.Spider):
@@ -17,12 +18,12 @@ class NaverSpider_inactive(scrapy.Spider):
 
     # start_requests() 함수 정의 - 메인 카테고리
     def start_requests(self):
-        section = 'society'
+        section = 'culture'
         # for section in ['society', 'culture']:
         yield scrapy.Request(url=self.base_url+'/breakingnews/'+section, callback=self.sub_category, meta={'section': section})
 
-
     # 서브카테고리 주소 + 날짜
+
     def sub_category(self, response):
         section = response.meta['section']
         sub_cate = response.css('.box_subtab li')
@@ -51,8 +52,8 @@ class NaverSpider_inactive(scrapy.Spider):
                 if date_str[-2:] == '01':
                     break
 
-
     # 페이지 넘기기
+
     def page_pass(self, response):
         section = response.meta['section']
         sectionItem = response.meta['SubCategory']
@@ -65,8 +66,8 @@ class NaverSpider_inactive(scrapy.Spider):
             # print(date_url)
             yield scrapy.Request(url=date_url, callback=self.news_url, meta={'section': section, 'SubCategory': sectionItem})
 
-
     # 뉴스url 넣으면 해당 뉴스 댓글주소 고유값 뽑아주는 함수
+
     def article_id(url):
         org = url
         article_id = org.split("/")[-1]  # ex.20211125234942863
@@ -96,8 +97,8 @@ class NaverSpider_inactive(scrapy.Spider):
         post_id = json.loads(soup.text)['post']['id']  # 드디어 드러나는 post id 의 값
         return post_id
 
-
     # 뉴스 리스트 목록에서 각 기사의 href 가져오기
+
     def news_url(self, response):
         section = response.meta['section']
         sectionItem = response.meta['SubCategory']
@@ -107,8 +108,8 @@ class NaverSpider_inactive(scrapy.Spider):
             yield scrapy.Request(url=news_url, callback=self.comment_url)
             yield scrapy.Request(url=news_url, callback=self.parse, meta={'section': section, 'SubCategory': sectionItem, 'news_url': news_url})
 
-
     # 각각의 뉴스로 들어가서 정보 가져와서 저장
+
     def parse(self, response):
 
         category = response.meta['section']
@@ -120,20 +121,18 @@ class NaverSpider_inactive(scrapy.Spider):
         content = ','.join([x for x in content_list])
         sub_content = ','.join([x for x in sub_content_list])
         photo_url_list = response.xpath('//*[@id="mArticle"]/div[2]/div[2]/section/figure/p/img/@src').getall()
-        
-       
+
         req = requests.get(news_url)
         soup = bs(req.content)
         data_client_id = soup.find('div', {'class': 'alex-area'}).get('data-client-id')
 
-        headers = {'authority': 'comment.daum.net',
-                   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36',
-                   'accept': '*/*',
-                   'accept-encoding': 'gzip, deflate, br',
-                   'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
-                   'referer': news_url,
-                   'authorization': ""}
-        
+        headers = {
+            'authority': 'comment.daum.net',
+            'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36',
+            'accept': '*/*', 'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7', 'referer': news_url, 'authorization': ""}
+
         # authorization 값 반환
         token_url = "https://alex.daum.net/oauth/token?grant_type=alex_credentials&client_id={}".format(data_client_id)
         req = requests.get(token_url, headers=headers)
@@ -156,17 +155,16 @@ class NaverSpider_inactive(scrapy.Spider):
             '화나요': action['ANGRY'],
             '추천해요': action['RECOMMEND'],
             '감동이에요': action['IMPRESS']}
-        
-     
 
-        
-        main_cate_chg = {'society':'사회', 'culture':'문화'}
-        sub_cate_chg = {"affair":'사건/사고', "people":'인물', 'education':'교육', 'media':'미디어', 'woman':'여성', 
-        'welfare':'복지', 'others':'사회일반', 'labor':'노동', 'environment':'환경', 'nation':'전국', 'nation/seoul':'서울', 
-        'nation/metro':'수도권', 'nation/gangwon':'강원', 'nation/chungcheong':'충청', 'nation/gyeongsang':'경상', 
-        'nation/jeolla':'전라', 'nation/jeju':'제주', 'nation/others':'지역일반', 'health':'건강','life':'생활정보', 'art':'공연/전시', 
-        'book':'책', 'leisure':'여행레져', 'others':'문화생활일반', 'weather':'날씨', 'fashion':'뷰티/패션', 'home':'가정/육아','food':'음식/맛집', 'religion':'종교' }
-        
+        main_cate_chg = {'society': '사회', 'culture': '문화'}
+        sub_cate_chg = {
+            "affair": '사건/사고', "people": '인물', 'education': '교육', 'media': '미디어', 'woman': '여성', 'welfare': '복지',
+            'others': '사회일반', 'labor': '노동', 'environment': '환경', 'nation': '전국', 'nation/seoul': '서울',
+            'nation/metro': '수도권', 'nation/gangwon': '강원', 'nation/chungcheong': '충청', 'nation/gyeongsang': '경상',
+            'nation/jeolla': '전라', 'nation/jeju': '제주', 'nation/others': '지역일반', 'health': '건강', 'life': '생활정보',
+            'art': '공연/전시', 'book': '책', 'leisure': '여행레져', 'others': '문화생활일반', 'weather': '날씨', 'fashion': '뷰티/패션',
+            'home': '가정/육아', 'food': '음식/맛집', 'religion': '종교'}
+
         item = DaumnewsItem()
         item['DomainID'] = 0
         item['MainCategory'] = main_cate_chg[category]
@@ -182,8 +180,8 @@ class NaverSpider_inactive(scrapy.Spider):
 
         yield item
 
-
      # 댓글url 가져와서 댓글 정보 저장
+
     def comment_url(self, response):
         news_url = response.url
         offset = 0
@@ -209,7 +207,7 @@ class NaverSpider_inactive(scrapy.Spider):
         access_token = json.loads(req.content)['access_token']
         authorization = 'Bearer '+access_token
         authorization
-        
+
         # article - comment 연결 짓는 key값 반환
         header['authorization'] = authorization  # authorization 값을 꼭 추가
         post_url = """https://comment.daum.net/apis/v1/ui/single/main/@{}""".format(article_id)
@@ -224,17 +222,17 @@ class NaverSpider_inactive(scrapy.Spider):
         soup = bs(html.text, 'html.parser')
         cmt_json = json.loads(soup.text)
 
-        comment_list = []
         for temp_json in cmt_json:
+            comment_list = []
             comment_list.append(str(news_url))
             comment_list.append(str(temp_json['userId']))
             comment_list.append(str(temp_json['user']['displayName']))
             comment_list.append(str(pd.to_datetime(temp_json['createdAt']).strftime('%Y-%m-%d')))
-            comment_list.append(str(temp_json['content']).strip())
+            comment_list.append('"' + re.sub("[\n\t]", "", temp_json['content']) + '"')
             with open('news_comment.csv', 'a', encoding='utf-8') as f:
-                f.write(','.join([f'{com}' for com in comment_list]).strip())
+                f.write(','.join(comment_list))
+                f.write(',')
                 f.write('\n')
-        
 
         if len(cmt_json) == 100:
             url_list = news_url.split('offset=')
