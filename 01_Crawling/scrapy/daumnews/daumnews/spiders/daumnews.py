@@ -49,7 +49,8 @@ class NaverSpider_inactive(scrapy.Spider):
                 date_url2 = self.base_url+sectionItem_URL + '?regDate=' + date_str + '&page='
                 yield scrapy.Request(url=date_url, callback=self.page_pass, meta={'date_url2': date_url2, 'section': section, 'SubCategory': sectionItem})
 
-                if date_str[-2:] == '01':
+                # if date_str[-2:] == '01':
+                if date_count == 30:
                     break
 
     # 페이지 넘기기
