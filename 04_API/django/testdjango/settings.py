@@ -22,6 +22,7 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 INSTALLED_APPS = [
     # Custom apps
     'articles',
+    'react_frontend',
 
     # 3rd party apps
     'rest_framework',

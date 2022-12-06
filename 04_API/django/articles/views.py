@@ -18,12 +18,14 @@ def detail(request, article_id):
 def list_article(request):
 
     if request.method == 'GET': # 조회
+
         articles = get_list_or_404(Article)
         serializer = ArticleSerializer(articles, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     elif request.method == 'POST': # 생성
+
         articles = get_list_or_404(Article, pk=1)
         serializer = ArticleSerializer(articles)
         

@@ -6,5 +6,6 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('articles/', include('articles.urls'))
+    path('articles/', include('articles.urls')),
+    path('', include('react_frontend.urls')),
 ]
