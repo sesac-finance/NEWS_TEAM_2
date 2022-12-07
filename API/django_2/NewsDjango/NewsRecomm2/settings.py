@@ -12,7 +12,7 @@ env = environ.Env(
 environ.Env.read_env(os.path.join(BASE_DIR,'.env'))
 
 
-SECRET_KEY = "django-insecure-65wl$(xyq33d90ey^j*c99tnf+0uit6x9r+l2#b5$hy2weogg4"
+SECRET_KEY = env('SECRET_KEY')
 
 
 DEBUG = True
