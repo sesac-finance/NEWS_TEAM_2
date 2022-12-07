@@ -1,6 +1,7 @@
 from pathlib import Path
 import environ
 import os
+import private_setting
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,7 +25,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     # Custom apps
-    # 'news',
+    'news',
     
     # 3rd party apps
     'rest_framework',
@@ -71,12 +72,8 @@ WSGI_APPLICATION = "NewsRecomm2.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
+#my_settings.py
+DATABASES = private_setting.DATABASES
 
 
 # Password validation
