@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+import my_settings
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -7,9 +8,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-!43x5jz7bi5y1d*e99-r^wa_s0(rkl^!)n=di^)iq(0lti3r6!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -67,20 +65,10 @@ WSGI_APPLICATION = 'testdjango.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
+DATABASES = my_settings.DATABASES
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        # 'NAME': 'news_db', # 로컬에 구축된 전체 뉴스/댓글 schema
-        'NAME': 'newsweb', # 장고 연동을 위해 새로 구축한 schema
-        'USER': 'root',
-        'PASSWORD': 'jeon8934',
-        'HOST': '127.0.0.1',
-        'PORT': '3306'
-    }
-}
-
+# SECRET_KEY
+SECRET_KEY =  my_settings.SECRET
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
