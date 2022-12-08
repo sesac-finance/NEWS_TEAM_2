@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     
     # 3rd party apps
     'rest_framework',
+    
 
     "django.contrib.admin",
     "django.contrib.auth",
@@ -37,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 ]
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

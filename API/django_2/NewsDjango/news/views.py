@@ -3,26 +3,51 @@ from django.shortcuts import render
 # Create your views here.
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from .models import TbDomain
-from .serializers import TestDataSerializer
+from .models import TbComment, TbDomain, TbNews, TbUser #1
+from .serializers import TestDataSerializer, TbUserSerializer,TbNewsSerializer,NewsRecommenSerializer #2
+import pandas as pd
 
-# 장고에 뉴스데이터 프레임을 올려놔라
-# 리턴하기전에 Function에서 부른다고 생각하면됨 
-# news_df = pd.read_csv()
+
+# /news/all/
 @api_view(['GET'])
-def getTbDomain(request):
-    datas = TbDomain.objects.all()
-    serializer = TestDataSerializer(datas, many=True)
-    return Response(serializer.data)
+def getTbNewsAll(request):
+    print('****'*10)
+    print('### 최신뉴스 10개를 출력합니다.')
+    data = TbNews.objects.all().order_by('writedat')[20:25] #1 # 받아올 페이지 
+    serializer = TbNewsSerializer(data, many=True) #2
+    return Response(serializer.data)  
 
+
+#/news/press/"언론사명"
 @api_view(['GET'])
-def getTbDomain_one(request, name):
-    print(name)
-    # 추천 로직 
-    # news_list = recommend(target_news, news_df)
-    # object가 아니니 , tbnews.objects.filter(pk__in=[])
+def getNewsPerPress(request,press):
+    print('****'*10)
+    print(f'### {press}에서 최근 5개의 뉴스을 추천합니다.')
+    data = TbNews.objects.filter(press=press).order_by('writedat')[:5] #1 # 받아올 페이지 
+    serializer = TbNewsSerializer(data, many=True) #2
+    return Response(serializer.data)  
 
-    data = TbDomain.objects.get(name=name)
-    # data = TbDomain.objects.get(name(컬럼명)=name(입력값))
-    serializer = TestDataSerializer(data, many=False)
-    return Response(serializer.data)
+#/news/mCategory/"카테고리"
+@api_view(['GET'])
+def getNewsPerMCategory(request,maincategory):
+    print('****'*10)
+    print(f'### {maincategory}에서 최근 5개의 뉴스을 추천합니다.')
+    data = TbNews.objects.filter(maincategory=maincategory).order_by('writedat')[:5] #1 # 받아올 페이지 
+    serializer = TbNewsSerializer(data, many=True) #2
+    return Response(serializer.data)  
+
+
+recommend_list = pd.read_csv('./data/recommend_dataframe.csv',index_col=0)
+
+#up-to-date/recomm_news
+@api_view(['GET'])
+def getNewsRecommend(request,newsid):
+
+    print('****'*10)
+    print(f'### {newsid}와(과)) 유사한 최근 5개의 뉴스을 추천합니다.')
+
+    recommend_l=recommend_list[recommend_list['newsid']==newsid]['recommend_list']
+    recommend=TbNews.objects.filter(pk__in=tuple(map(int, recommend_l.values[0][1:-1].split(','))))
+    serializer = NewsRecommenSerializer(recommend, many=True) #2
+    return Response(serializer.data) 
+
