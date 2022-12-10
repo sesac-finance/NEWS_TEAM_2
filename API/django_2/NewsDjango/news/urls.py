@@ -7,6 +7,7 @@ urlpatterns = [
     path('press/<str:press>/',views.getNewsPerPress, name='newsPress'),
     path('mCategory/<str:maincategory>/',views.getNewsPerMCategory, name='newsMCategory'),
     path('up-to-date/recomm_news/<int:newsid>/',views.getNewsRecommend,name='newsRecommend'),
+    path('<int:newsid>',views.getNews,name='news'),
 ]
 
 
